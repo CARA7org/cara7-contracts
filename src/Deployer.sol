@@ -9,17 +9,19 @@ import {ProxyVehicle} from "./vehicle/ProxyVehicle.sol";
 error InitializationFailed();
 
 contract Deployer is Ownable {
-  address private _beacon;
+  address private _vehicleBeacon;
+  address private _batteryBeacon;
 
   event ProxyVehicleDeployed(address addr, string vin);
   event ProxyBatteryDeployed(address addr, string batteryId);
 
-  constructor(address initialOwner, address beaconAddress) Ownable(initialOwner) {
-    _beacon = beaconAddress;
+  constructor(address initialOwner, address vehicleBeaconAddress, address batteryBeaconAddress) Ownable(initialOwner) {
+    _vehicleBeacon = vehicleBeaconAddress;
+    _batteryBeacon = batteryBeaconAddress;
   }
 
   function deployProxyVehicle(bytes memory data, string memory vin) external onlyOwner returns (address addr) {
-    bytes memory code = _getProxyVehicleCode(_beacon);
+    bytes memory code = _getProxyVehicleCode(_vehicleBeacon);
     uint256 salt = uint256(_computeVehicleSalt(vin));
 
     assembly {
@@ -34,7 +36,7 @@ contract Deployer is Ownable {
   }
 
   function deployProxyBattery(bytes memory data, string memory batteryId) external onlyOwner returns (address addr) {
-    bytes memory code = _getProxyBatteryCode(_beacon);
+    bytes memory code = _getProxyBatteryCode(_batteryBeacon);
     bytes32 salt = _computeBatterySalt(batteryId);
 
     assembly {
@@ -50,7 +52,7 @@ contract Deployer is Ownable {
 
   function computeProxyVehicleAddress(string memory vin) public view returns (address) {
     bytes32 salt = _computeVehicleSalt(vin);
-    bytes memory bytecode = _getProxyVehicleCode(_beacon);
+    bytes memory bytecode = _getProxyVehicleCode(_vehicleBeacon);
     bytes32 bytecodeHash = keccak256(bytecode);
     return address(uint160(uint(keccak256(abi.encodePacked(
       bytes1(0xff),
@@ -62,7 +64,7 @@ contract Deployer is Ownable {
 
   function computeProxyBatteryAddress(string memory batteryId) public view returns (address) {
     bytes32 salt = _computeBatterySalt(batteryId);
-    bytes memory bytecode = _getProxyBatteryCode(_beacon);
+    bytes memory bytecode = _getProxyBatteryCode(_batteryBeacon);
     bytes32 bytecodeHash = keccak256(bytecode);
     return address(uint160(uint(keccak256(abi.encodePacked(
       bytes1(0xff),
