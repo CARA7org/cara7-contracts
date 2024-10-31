@@ -52,7 +52,7 @@ contract Cara7 is Test {
     vm.stopPrank();
   }
 
-  function testCreateProxyVehicleWithDeployer() public {
+  function testCreateProxyVehicleWithDeployer() public returns (address) {
     vm.startPrank(owner);
 
     bytes memory data = abi.encodeWithSignature("initialize(address,address,string,string)", owner, address(_authorization), proxyVehicleName, proxyVehicleSymbol);
@@ -63,9 +63,11 @@ contract Cara7 is Test {
     assertTrue(proxyVehicle == computeAddress, "ProxyVehicle address is not correct");
 
     vm.stopPrank();
+
+    return proxyVehicle;
   }
 
-  function testCreateProxyBatteryWithDeployer() public {
+  function testCreateProxyBatteryWithDeployer() public returns (address) {
     vm.startPrank(owner);
 
     bytes memory data = abi.encodeWithSignature("initialize(address,address,string,string)", owner, address(_authorization), "Cara7Battery", "C7B");
@@ -76,6 +78,8 @@ contract Cara7 is Test {
     assertTrue(proxyBattery == computeAddress, "ProxyBattery address is not correct");
 
     vm.stopPrank();
+
+    return proxyBattery;
   }
 
   function testCreateProxyVehicleWithInitializeAfterDeployment() public {
@@ -112,7 +116,7 @@ contract Cara7 is Test {
   }
 
   function testCreateAndCheckInitializationVahicle() public {
-    ProxyVehicle proxyVehicle = ProxyVehicle(payable(testCreateProxyVehicle()));
+    ProxyVehicle proxyVehicle = ProxyVehicle(payable(testCreateProxyVehicleWithDeployer()));
     vm.startPrank(owner);
 
     string memory name = VehicleLogic(address(proxyVehicle)).name();
@@ -124,7 +128,7 @@ contract Cara7 is Test {
   }
 
   function testCreateAndCheckInitializationBattery() public {
-    address proxyBattery = testCreateProxyBattery();
+    address proxyBattery = testCreateProxyBatteryWithDeployer();
     vm.startPrank(owner);
 
     string memory name = BatteryLogic(address(proxyBattery)).name();
@@ -136,7 +140,7 @@ contract Cara7 is Test {
   }
 
   function testAddEventVehicle() public {
-    ProxyVehicle proxyVehicle = ProxyVehicle(payable(testCreateProxyVehicle()));
+    ProxyVehicle proxyVehicle = ProxyVehicle(payable(testCreateProxyVehicleWithDeployer()));
     vm.startPrank(owner);
 
     _authorization.authorize(owner);
