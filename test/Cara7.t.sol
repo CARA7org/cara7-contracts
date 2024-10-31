@@ -187,7 +187,28 @@ contract Cara7 is Test {
     vm.stopPrank();
   }
 
-  function testAddEventBatteryCo2() public {
+  function testAddEventShouldRevertWithoutAuthorization() public {
+    address proxyVehicle = testCreateProxyVehicleWithDeployer();
 
+    vm.startPrank(owner);
+
+    VehicleLogic(proxyVehicle).mint(user1, "VIN123");
+
+    string[] memory dataNames = new string[](2);
+    dataNames[0] = "Data1";
+    dataNames[1] = "Data2";
+    string[] memory dataValues = new string[](2);
+    dataValues[0] = "Value1";
+    dataValues[1] = "Value2";
+
+    vm.expectRevert();
+
+    VehicleLogic(proxyVehicle).addEvent("Event1", dataNames, dataValues);
+
+    vm.stopPrank();
+  }
+
+  function testAddEventBatteryCo2() public {
+    address proxyBattery = testCreateProxyBatteryWithDeployer();
   }
 }
