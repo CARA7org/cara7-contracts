@@ -5,7 +5,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 import { IMetadata } from "../interfaces/IMetadata.sol";
-import { ICara7Authorization } from "../interfaces/ICara7Authorization.sol";
+import { IAuthorization } from "../interfaces/IAuthorization.sol";
 
 enum BatteryStatus {
   UNINITIALIZED,
@@ -24,7 +24,7 @@ error InvalidAuthorization();
 error InvalidCallerNotOwner();
 error InvalidIndex();
 
-contract Cara7BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
+contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
   address private _authorizationContract;
   Metadata private _metadata;
 
@@ -39,7 +39,7 @@ contract Cara7BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
   mapping (uint256 => IMetadata.Event) private _eventsStatesLifeCycle;
 
   modifier onlyAuthorized() {
-    if (ICara7Authorization(_authorizationContract)
+    if (IAuthorization(_authorizationContract)
       .isAuthorized(msg.sender) == false) revert InvalidAuthorization();
     _;
   }

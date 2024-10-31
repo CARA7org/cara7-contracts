@@ -3,12 +3,12 @@ pragma solidity ^0.8.25;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import {Cara7ProxyBattery} from "./battery/Cara7ProxyBattery.sol";
-import {Cara7ProxyVehicle} from "./vehicle/Cara7ProxyVehicle.sol";
+import {ProxyBattery} from "./battery/ProxyBattery.sol";
+import {ProxyVehicle} from "./vehicle/ProxyVehicle.sol";
 
 error InitializationFailed();
 
-contract Cara7Deployer is Ownable {
+contract Deployer is Ownable {
   address private _beacon;
 
   event ProxyVehicleDeployed(address addr, string vin);
@@ -82,14 +82,14 @@ contract Cara7Deployer is Ownable {
 
   function _getProxyBatteryCode(address beacon) internal pure returns (bytes memory) {
     return abi.encodePacked(
-      type(Cara7ProxyBattery).creationCode,
+      type(ProxyBattery).creationCode,
       abi.encode(beacon, "")
     );
   }
 
   function _getProxyVehicleCode(address beacon) internal pure returns (bytes memory) {
     return abi.encodePacked(
-      type(Cara7ProxyVehicle).creationCode,
+      type(ProxyVehicle).creationCode,
       abi.encode(beacon, "")
     );
   }

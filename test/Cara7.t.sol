@@ -2,30 +2,30 @@
 pragma solidity ^0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Cara7BatteryLogic} from "../src/battery/Cara7BatteryLogic.sol";
-import {Cara7VehicleLogic} from "../src/vehicle/Cara7VehicleLogic.sol";
-import {Cara7ProxyBattery} from "../src/battery/Cara7ProxyBattery.sol";
-import {Cara7ProxyVehicle} from "../src/vehicle/Cara7ProxyVehicle.sol";
-import {Cara7UpgradeableProxyBattery} from "../src/battery/Cara7UpgradeableProxyBattery.sol";
-import {Cara7UpgradeableProxyVehicle} from "../src/vehicle/Cara7UpgradeableProxyVehicle.sol";
-import {Cara7Authorization} from "../src/Cara7Authorization.sol";
-import {Cara7Deployer} from "../src/Cara7Deployer.sol";
+import {BatteryLogic} from "../src/battery/BatteryLogic.sol";
+import {VehicleLogic} from "../src/vehicle/VehicleLogic.sol";
+import {ProxyBattery} from "../src/battery/ProxyBattery.sol";
+import {ProxyVehicle} from "../src/vehicle/ProxyVehicle.sol";
+import {BatteryBeacon} from "../src/battery/BatteryBeacon.sol";
+import {VehicleBeacon} from "../src/vehicle/VehicleBeacon.sol";
+import {Authorization} from "../src/Authorization.sol";
+import {Deployer} from "../src/Deployer.sol";
 
 import {IMetadata} from "../src/interfaces/IMetadata.sol";
 
 contract Cara7 is Test {
-  Cara7BatteryLogic private _batteryLogic;
-  Cara7VehicleLogic private _vehicleLogic;
+  BatteryLogic private _batteryLogic;
+  VehicleLogic private _vehicleLogic;
 
-  Cara7UpgradeableProxyBattery private _upgradeableProxyBattery;
-  Cara7UpgradeableProxyVehicle private _upgradeableProxyVehicle;
+  BatteryBeacon private _upgradeableProxyBattery;
+  VehicleBeacon private _upgradeableProxyVehicle;
 
-  Cara7ProxyBattery private _proxyBattery;
-  Cara7ProxyVehicle private _proxyVehicle;
+  ProxyBattery private _proxyBattery;
+  ProxyVehicle private _proxyVehicle;
 
-  Cara7Authorization private _authorization;
+  Authorization private _authorization;
 
-  Cara7Deployer private _deployer;
+  Deployer private _deployer;
 
   address private owner = makeAddr("owner");
   address private user1 = makeAddr("user1");
@@ -39,15 +39,15 @@ contract Cara7 is Test {
   function setUp() public {
     vm.startPrank(owner);
 
-    _batteryLogic = new Cara7BatteryLogic();
-    _vehicleLogic = new Cara7VehicleLogic();
+    _batteryLogic = new BatteryLogic();
+    _vehicleLogic = new VehicleLogic();
 
-    _upgradeableProxyBattery = new Cara7UpgradeableProxyBattery(address(_batteryLogic));
-    _upgradeableProxyVehicle = new Cara7UpgradeableProxyVehicle(address(_vehicleLogic));
+    _upgradeableProxyBattery = new BatteryBeacon(address(_batteryLogic));
+    _upgradeableProxyVehicle = new VehicleBeacon(address(_vehicleLogic));
 
-    _authorization = new Cara7Authorization(owner);
+    _authorization = new Authorization(owner);
 
-    _deployer = new Cara7Deployer(owner, address(_upgradeableProxyVehicle));
+    _deployer = new Deployer(owner, address(_upgradeableProxyVehicle));
 
     vm.stopPrank();
   }
@@ -81,10 +81,10 @@ contract Cara7 is Test {
   function testCreateProxyVehicleWithInitializeAfterDeployment() public {
     vm.startPrank(owner);
 
-    _proxyVehicle = new Cara7ProxyVehicle(address(_upgradeableProxyVehicle), "");
+    _proxyVehicle = new ProxyVehicle(address(_upgradeableProxyVehicle), "");
     assertTrue(address(_proxyVehicle) != address(0), "ProxyVehicle is not created");
 
-    Cara7VehicleLogic(address(_proxyVehicle)).initialize(owner, address(_authorization), proxyVehicleName, proxyVehicleSymbol);
+    VehicleLogic(address(_proxyVehicle)).initialize(owner, address(_authorization), proxyVehicleName, proxyVehicleSymbol);
 
     vm.stopPrank();
   }
@@ -92,7 +92,7 @@ contract Cara7 is Test {
   function testCreateProxyVehicle() public returns (address) {
     vm.startPrank(owner);
 
-    _proxyVehicle = new Cara7ProxyVehicle(address(_upgradeableProxyVehicle), abi.encodeWithSignature("initialize(address,address,string,string)", owner, address(_authorization), proxyVehicleName, proxyVehicleSymbol));
+    _proxyVehicle = new ProxyVehicle(address(_upgradeableProxyVehicle), abi.encodeWithSignature("initialize(address,address,string,string)", owner, address(_authorization), proxyVehicleName, proxyVehicleSymbol));
     assertTrue(address(_proxyVehicle) != address(0), "ProxyVehicle is not created");
 
     vm.stopPrank();
@@ -103,7 +103,7 @@ contract Cara7 is Test {
   function testCreateProxyBattery() public returns (address) {
     vm.startPrank(owner);
 
-    _proxyBattery = new Cara7ProxyBattery(address(_upgradeableProxyBattery), abi.encodeWithSignature("initialize(address,address,string,string)", owner, address(_authorization), "Cara7Battery", "C7B"));
+    _proxyBattery = new ProxyBattery(address(_upgradeableProxyBattery), abi.encodeWithSignature("initialize(address,address,string,string)", owner, address(_authorization), "Cara7Battery", "C7B"));
     assertTrue(address(_proxyBattery) != address(0), "ProxyBattery is not created");
 
     vm.stopPrank();
@@ -112,11 +112,11 @@ contract Cara7 is Test {
   }
 
   function testCreateAndCheckInitializationVahicle() public {
-    Cara7ProxyVehicle proxyVehicle = Cara7ProxyVehicle(payable(testCreateProxyVehicle()));
+    ProxyVehicle proxyVehicle = ProxyVehicle(payable(testCreateProxyVehicle()));
     vm.startPrank(owner);
 
-    string memory name = Cara7VehicleLogic(address(proxyVehicle)).name();
-    string memory symbol = Cara7VehicleLogic(address(proxyVehicle)).symbol();
+    string memory name = VehicleLogic(address(proxyVehicle)).name();
+    string memory symbol = VehicleLogic(address(proxyVehicle)).symbol();
     assertTrue(keccak256(bytes(name)) == keccak256(bytes(proxyVehicleName)), "Name is not correct");
     assertTrue(keccak256(bytes(symbol)) == keccak256(bytes(proxyVehicleSymbol)), "Symbol is not correct");
 
@@ -127,8 +127,8 @@ contract Cara7 is Test {
     address proxyBattery = testCreateProxyBattery();
     vm.startPrank(owner);
 
-    string memory name = Cara7BatteryLogic(address(proxyBattery)).name();
-    string memory symbol = Cara7BatteryLogic(address(proxyBattery)).symbol();
+    string memory name = BatteryLogic(address(proxyBattery)).name();
+    string memory symbol = BatteryLogic(address(proxyBattery)).symbol();
     assertTrue(keccak256(bytes(name)) == keccak256(bytes("Cara7Battery")), "Name is not correct");
     assertTrue(keccak256(bytes(symbol)) == keccak256(bytes("C7B")), "Symbol is not correct");
 
@@ -136,12 +136,12 @@ contract Cara7 is Test {
   }
 
   function testAddEventVehicle() public {
-    Cara7ProxyVehicle proxyVehicle = Cara7ProxyVehicle(payable(testCreateProxyVehicle()));
+    ProxyVehicle proxyVehicle = ProxyVehicle(payable(testCreateProxyVehicle()));
     vm.startPrank(owner);
 
     _authorization.authorize(owner);
 
-    Cara7VehicleLogic(address(proxyVehicle)).mint(user1, "VIN123");
+    VehicleLogic(address(proxyVehicle)).mint(user1, "VIN123");
 
     string[] memory dataNames = new string[](2);
     dataNames[0] = "Data1";
@@ -150,7 +150,7 @@ contract Cara7 is Test {
     dataValues[0] = "Value1";
     dataValues[1] = "Value2";
 
-    Cara7VehicleLogic(address(proxyVehicle)).addEvent("Event1", dataNames, dataValues);
+    VehicleLogic(address(proxyVehicle)).addEvent("Event1", dataNames, dataValues);
 
     string[] memory dataNames2 = new string[](2);
     dataNames2[0] = "Data3";
@@ -159,12 +159,12 @@ contract Cara7 is Test {
     dataValues2[0] = "Value3";
     dataValues2[1] = "Value4";
 
-    Cara7VehicleLogic(address(proxyVehicle)).addEvent("Event2", dataNames2, dataValues2);
+    VehicleLogic(address(proxyVehicle)).addEvent("Event2", dataNames2, dataValues2);
 
-    uint256 eventsCount = Cara7VehicleLogic(address(proxyVehicle)).getEventsCount();
+    uint256 eventsCount = VehicleLogic(address(proxyVehicle)).getEventsCount();
     assertTrue(eventsCount == 2, "Events count is not correct");
 
-    IMetadata.Event memory event1 = Cara7VehicleLogic(address(proxyVehicle)).getEvent(0);
+    IMetadata.Event memory event1 = VehicleLogic(address(proxyVehicle)).getEvent(0);
     assertTrue(keccak256(bytes(event1.eventName)) == keccak256(bytes("Event1")), "Event1 name is not correct");
     assertTrue(event1.timestamp > 0, "Event1 timestamp is not correct");
     assertTrue(keccak256(bytes(event1.dataNames[0])) == keccak256(bytes("Data1")), "Event1 dataNames[0] is not correct");
@@ -172,7 +172,7 @@ contract Cara7 is Test {
     assertTrue(keccak256(bytes(event1.dataNames[1])) == keccak256(bytes("Data2")), "Event1 dataNames[1] is not correct");
     assertTrue(keccak256(bytes(event1.dataValues[1])) == keccak256(bytes("Value2")), "Event1 dataValues[1] is not correct");
 
-    IMetadata.Event memory event2 = Cara7VehicleLogic(address(proxyVehicle)).getEvent(1);
+    IMetadata.Event memory event2 = VehicleLogic(address(proxyVehicle)).getEvent(1);
     assertTrue(keccak256(bytes(event2.eventName)) == keccak256(bytes("Event2")), "Event2 name is not correct");
     assertTrue(event2.timestamp > 0, "Event2 timestamp is not correct");
     assertTrue(keccak256(bytes(event2.dataNames[0])) == keccak256(bytes("Data3")), "Event2 dataNames[0] is not correct");

@@ -6,7 +6,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 import { IMetadata } from "../interfaces/IMetadata.sol";
-import { ICara7Authorization } from "../interfaces/ICara7Authorization.sol";
+import { IAuthorization } from "../interfaces/IAuthorization.sol";
 
 enum VehicleStatus {
   UNINITIALIZED,
@@ -18,7 +18,7 @@ error InvalidCallerNotOwner();
 error AlreadyMinted();
 error InvalidIndex();
 
-contract Cara7VehicleLogic is OwnableUpgradeable, ERC721Upgradeable {
+contract VehicleLogic is OwnableUpgradeable, ERC721Upgradeable {
   address private _authorizationContract;
   string private _vin;
 
@@ -28,7 +28,7 @@ contract Cara7VehicleLogic is OwnableUpgradeable, ERC721Upgradeable {
   event VehicleMinted(address indexed to);
 
   modifier onlyAuthorized() {
-    if (ICara7Authorization(_authorizationContract)
+    if (IAuthorization(_authorizationContract)
       .isAuthorized(msg.sender) == false) revert InvalidAuthorization();
     _;
     

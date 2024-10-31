@@ -8,7 +8,7 @@ enum AuthorizationStatus {
   AUTHORIZED
 }
 
-contract Cara7Authorization is Ownable {
+contract Authorization is Ownable {
   mapping (address => uint8) private _authorizations;
 
   constructor(address initialOwner) Ownable(initialOwner) {}

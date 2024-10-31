@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.25;
 
-interface ICara7Authorization {
+interface IAuthorization {
   function isAuthorized(address _account) external view returns (bool);
 }
