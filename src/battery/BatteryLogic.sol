@@ -62,35 +62,28 @@ contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
     string memory batteryStatus,
     uint256 productionDate
   ) external onlyOwner {
-    _mint(to);
+    _mint(to, 1);
     _setMetadata(batteryId, manufacturer, batteryStatus, productionDate);
   }
 
-  function addEventCo2(string memory eventName, string[] memory dataNames, string[] memory dataValues) external {
-    if (ownerOf(1) != msg.sender) revert InvalidCallerNotOwner();
+  function addEventCo2(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
     _eventsCo2[_eventsCountCo2] = IMetadata.Event(eventName, block.timestamp, dataNames, dataValues);
     unchecked {_eventsCountCo2++;}
   }
 
-  function addEventRawMaterialsPercent(string memory eventName, string[] memory dataNames, string[] memory dataValues) external {
-    if (ownerOf(1) != msg.sender) revert InvalidCallerNotOwner();
+  function addEventRawMaterialsPercent(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
     _eventsRawMaterialsPercent[_eventsCountRawMaterialsPercent] = IMetadata.Event(eventName, block.timestamp, dataNames, dataValues);
     unchecked {_eventsCountRawMaterialsPercent++;}
   }
 
-  function addEventTracability(string memory eventName, string[] memory dataNames, string[] memory dataValues) external {
-    if (ownerOf(1) != msg.sender) revert InvalidCallerNotOwner();
+  function addEventTracability(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
     _eventsTracability[_eventsCountTracability] = IMetadata.Event(eventName, block.timestamp, dataNames, dataValues);
     unchecked {_eventsCountTracability++;}
   }
 
-  function addEventStatesLifeCycle(string memory eventName, string[] memory dataNames, string[] memory dataValues) external {
+  function addEventStatesLifeCycle(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
     _eventsStatesLifeCycle[_eventsCountStatesLifeCycle] = IMetadata.Event(eventName, block.timestamp, dataNames, dataValues);
     unchecked {_eventsCountStatesLifeCycle++;}
-  }
-
-  function _mint(address to) internal {
-    _safeMint(to, 1);
   }
 
   function _setMetadata(
