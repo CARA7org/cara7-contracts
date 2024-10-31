@@ -47,7 +47,7 @@ contract Cara7 is Test {
 
     _authorization = new Authorization(owner);
 
-    _deployer = new Deployer(owner, address(_upgradeableProxyVehicle));
+    _deployer = new Deployer(owner, address(_upgradeableProxyVehicle), address(_upgradeableProxyBattery));
 
     vm.stopPrank();
   }
@@ -210,5 +210,22 @@ contract Cara7 is Test {
 
   function testAddEventBatteryCo2() public {
     address proxyBattery = testCreateProxyBatteryWithDeployer();
+
+    vm.startPrank(owner);
+
+    _authorization.authorize(owner);
+
+    BatteryLogic(proxyBattery).mint(user1, "Battery123", "Manufacturer", "Status", 123456);
+
+    string[] memory dataNames = new string[](2);
+    dataNames[0] = "Data1";
+    dataNames[1] = "Data2";
+    string[] memory dataValues = new string[](2);
+    dataValues[0] = "Value1";
+    dataValues[1] = "Value2";
+
+    BatteryLogic(proxyBattery).addEventCo2("Event1", dataNames, dataValues);
+
+    vm.stopPrank();
   }
 }
