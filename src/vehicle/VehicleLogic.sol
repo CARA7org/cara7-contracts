@@ -17,15 +17,19 @@ error InvalidAuthorization();
 error InvalidCallerNotOwner();
 error AlreadyMinted();
 error InvalidIndex();
+error TransferFailed();
 
 contract VehicleLogic is OwnableUpgradeable, ERC721Upgradeable {
   address private _authorizationContract;
   string private _vin;
 
+  mapping (uint256 => address) private _batteries;
   mapping (uint256 => IMetadata.Event) private _events;
   uint256 private _eventsCount;
+  uint256 private _batteriesCount;
 
   event VehicleMinted(address indexed to);
+  event Event(address from, string eventName, uint256 timestamp, string[] dataNames, string[] dataValues);
 
   modifier onlyAuthorized() {
     if (IAuthorization(_authorizationContract)
@@ -59,11 +63,33 @@ contract VehicleLogic is OwnableUpgradeable, ERC721Upgradeable {
   function addEvent(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
     _events[_eventsCount] = IMetadata.Event(eventName, block.timestamp, dataNames, dataValues);
     unchecked {_eventsCount++;}
+    emit Event(msg.sender, eventName, block.timestamp, dataNames, dataValues);
   }
 
   function transferERC721(address contractERC721, address to) external {
-    if (ownerOf(1) != msg.sender) revert InvalidCallerNotOwner();
-    IERC721(contractERC721).transferFrom(address(this), to, 1);
+    if (
+      ownerOf(1) != msg.sender &&
+      IAuthorization(_authorizationContract).isAuthorized(msg.sender) == false
+    ) revert InvalidAuthorization();
+    IERC721(contractERC721).ownerOf(1);
+    IERC721(contractERC721).safeTransferFrom(address(this), to, 1);
+  }
+
+  function approveERC721(address contractERC721, address to) external {
+    if (
+      ownerOf(1) != msg.sender &&
+      IAuthorization(_authorizationContract).isAuthorized(msg.sender) == false
+    ) revert InvalidCallerNotOwner();
+    IERC721(contractERC721).approve(to, 1);
+  }
+
+  function onBatteryReceived(address batteryContract) external {
+    if (IERC721(batteryContract).ownerOf(1) != address(this)) revert TransferFailed();
+    _batteries[_batteriesCount++] = batteryContract;
+  }
+
+  function onERC721Received(address, address, uint256, bytes memory) public virtual returns (bytes4) {
+    return this.onERC721Received.selector;
   }
 
   function metadata() external view returns (string memory) {
@@ -77,5 +103,14 @@ contract VehicleLogic is OwnableUpgradeable, ERC721Upgradeable {
   function getEvent(uint256 index) external view returns (IMetadata.Event memory) {
     if (index >= _eventsCount) revert InvalidIndex();
     return _events[index];
+  }
+
+  function getBatteriesHistory() external view returns (address[] memory) {
+    address[] memory history = new address[](_batteriesCount);
+    for (uint256 i = 0; i < _batteriesCount; ) {
+      history[i] = _batteries[i];
+      unchecked {i++;}
+    }
+    return history;
   }
 }
