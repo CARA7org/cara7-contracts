@@ -6,6 +6,7 @@ import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC
 
 import { IMetadata } from "../interfaces/IMetadata.sol";
 import { IAuthorization } from "../interfaces/IAuthorization.sol";
+import { IVehicle } from "../interfaces/IVehicle.sol";
 
 enum BatteryStatus {
   UNINITIALIZED,
@@ -64,6 +65,18 @@ contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
   ) external onlyOwner {
     _mint(to, 1);
     _setMetadata(batteryId, manufacturer, batteryStatus, productionDate);
+    if (_checkAddressIsContract(to)) {
+      IVehicle(to).onBatteryReceived(address(this));
+    }
+  }
+
+  function transferToVehicle(address from, address vehicleContract) external {
+    if (
+      ownerOf(1) != msg.sender &&
+      IAuthorization(_authorizationContract).isAuthorized(msg.sender) == false
+    ) revert InvalidCallerNotOwner();
+    safeTransferFrom(from, vehicleContract, 1);
+    IVehicle(vehicleContract).onBatteryReceived(address(this));
   }
 
   function addEventCo2(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
@@ -133,5 +146,13 @@ contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
   function getEventStatesLifeCycle(uint256 index) external view returns (IMetadata.Event memory) {
     if (index >= _eventsCountStatesLifeCycle) revert InvalidIndex();
     return _eventsStatesLifeCycle[index];
+  }
+
+  function _checkAddressIsContract(address addr) internal view returns (bool) {
+    uint32 size;
+    assembly {
+      size := extcodesize(addr)
+    }
+    return size > 0;
   }
 }
