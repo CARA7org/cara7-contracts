@@ -8,6 +8,10 @@
 
 * [Smart-contracts structure](#smart-contracts-structure)
 
+* [Diagram](#structure-diagram)
+
+* [Deployed contract](#deployed-contract)
+
 * [Foundry](#foundry)
 
 ## Intro
@@ -32,6 +36,19 @@ Contracts for Vehicle & Battery passport.
   - **BatteryLogic**: This contract consit of the logic behind the battery NFT passport.
   - **BatteryBeacon**: This contract consist to link the proxy to the corresponding logic.
   - **BatteryProxy**: This proxy contract serve to be deployed at minimum cost and uppgreadable and represent the Battery passport.
+
+### Structure Diagram
+
+![smart-contract structure](img/Diagram-smart-contract-structure-light.jpg)
+
+## Deployed contract
+
+| Nom du Contrat | Adresse du Contrat                           | Lien vers l'Explorateur                                                                                      |
+| -------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Deployer       | `0x78aaAcd84F0336671C45B17B683851077034ddEa` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x78aaAcd84F0336671C45B17B683851077034ddEa) |
+| Authorization  | `0x2A9F6B5b6c0a51B804Fcd044C86Bfd19Ab042124` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x2A9F6B5b6c0a51B804Fcd044C86Bfd19Ab042124) |
+| Beacon Vehicle | `0x5D2Ae7da2c74dCe17Aca6F2480e01405aa145E27` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x5D2Ae7da2c74dCe17Aca6F2480e01405aa145E27) |
+| Beacon Battery | `0x04198Da884AaCBfBd437f2cDCf1C48ebAa81ab66` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x04198Da884AaCBfBd437f2cDCf1C48ebAa81ab66) |
 
 ## Foundry
 
