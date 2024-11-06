@@ -29,10 +29,13 @@ contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
   address private _authorizationContract;
   Metadata private _metadata;
 
+  uint256 private _eventsCounter;
   uint256 private _eventsCountCo2;
   uint256 private _eventsCountRawMaterialsPercent;
   uint256 private _eventsCountTracability;
   uint256 private _eventsCountStatesLifeCycle;
+
+  mapping (uint256 => IMetadata.Event) private _events;
 
   mapping (uint256 => IMetadata.Event) private _eventsCo2;
   mapping (uint256 => IMetadata.Event) private _eventsRawMaterialsPercent;
@@ -79,6 +82,11 @@ contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
     IVehicle(vehicleContract).onBatteryReceived(address(this));
   }
 
+  function addEvent(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
+    _events[_eventsCounter] = IMetadata.Event(eventName, block.timestamp, dataNames, dataValues);
+    unchecked {_eventsCounter++;}
+  }
+
   function addEventCo2(string memory eventName, string[] memory dataNames, string[] memory dataValues) external onlyAuthorized {
     _eventsCo2[_eventsCountCo2] = IMetadata.Event(eventName, block.timestamp, dataNames, dataValues);
     unchecked {_eventsCountCo2++;}
@@ -112,6 +120,10 @@ contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
     return _metadata;
   }
 
+  function getEventsCount() external view returns (uint256) {
+    return _eventsCounter;
+  }
+
   function getEventsCountCo2() external view returns (uint256) {
     return _eventsCountCo2;
   }
@@ -126,6 +138,11 @@ contract BatteryLogic is ERC721Upgradeable, OwnableUpgradeable {
 
   function getEventsCountStatesLifeCycle() external view returns (uint256) {
     return _eventsCountStatesLifeCycle;
+  }
+
+  function getEvent(uint256 index) external view returns (IMetadata.Event memory) {
+    if (index >= _eventsCounter) revert InvalidIndex();
+    return _events[index];
   }
 
   function getEventCo2(uint256 index) external view returns (IMetadata.Event memory) {
