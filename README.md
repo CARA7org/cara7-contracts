@@ -12,6 +12,10 @@
 
 * [Deployed contract](#deployed-contract)
 
+* [Contracts info](#contracts)
+
+* [Instalation](#instalation)
+
 * [Foundry](#foundry)
 
 ## Intro
@@ -21,6 +25,8 @@ Contracts for Vehicle & Battery passport.
 ## General info
 
 ### Smart-contracts structure
+
+Each proxy is an NFT so we can retrieve easely a specific NFT. This can be achieve by the deployer contract that create each proxy with the create2 opcode.
 
 - **Deployer**: Contracts that deploy 2 sorts of proxy _Vehicle_ and _Battery_ at determistic address and the possibility to retrieve contract address with specific parameters.
 
@@ -49,6 +55,49 @@ Contracts for Vehicle & Battery passport.
 | Authorization  | `0x2A9F6B5b6c0a51B804Fcd044C86Bfd19Ab042124` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x2A9F6B5b6c0a51B804Fcd044C86Bfd19Ab042124) |
 | Beacon Vehicle | `0x5D2Ae7da2c74dCe17Aca6F2480e01405aa145E27` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x5D2Ae7da2c74dCe17Aca6F2480e01405aa145E27) |
 | Beacon Battery | `0x04198Da884AaCBfBd437f2cDCf1C48ebAa81ab66` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x04198Da884AaCBfBd437f2cDCf1C48ebAa81ab66) |
+
+## Contracts
+
+### Deployer
+
+The Deployer Smart Contract is designed to facilitate the deployment and recreation of proxy contracts. Instead of maintaining a registry of addresses, this contract can deterministically recreate the addresses of proxies.
+
+- deployProxyVehicle: Create a proxy vehicle
+- deployProxyBattery: Create a proxy battery
+- computeProxyVehicleAddress: Get the address of a proxy vehicle
+- computeProxyBatteryAddress: Get the address of a proxy battery
+
+### Athorization
+
+The Authorization Smart Contract is designed to manage access control, enabling specific functions to be accessible only to authorized address.
+
+- authorize: Add an authorization for an address
+- unauthorize: Remove an authorization for an address
+- isAuthorized: Return if an address as authorization
+
+### Beacon
+
+The Beacon Smart Contract serves as a centralized reference for proxies, enabling them to dynamically link to the correct logic contract. This design pattern allows proxies to point to a single, updatable contract for business logic, ensuring they are always using the latest version without redeployment.
+
+## Instalation
+
+This repo use Foundry => https://book.getfoundry.sh/
+
+```
+git clone git@github.com:CARA7org/cara7-contracts.git
+```
+
+```
+cd cara7-contracts
+```
+
+```
+forge install
+```
+
+```
+forge test -vvv
+```
 
 ## Foundry
 
