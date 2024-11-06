@@ -139,6 +139,71 @@ contract Cara7 is Test {
     vm.stopPrank();
   }
 
+  function testMintBatteryAndSendToVehicle() public {
+    address proxyBattery = testCreateProxyBatteryWithDeployer();
+    address proxyVehicle = testCreateProxyVehicleWithDeployer();
+    vm.startPrank(owner);
+
+    _authorization.authorize(owner);
+
+    BatteryLogic(proxyBattery).mint(user1, "Battery123", "Manufacturer", "Status", 123456);
+
+    VehicleLogic(proxyVehicle).mint(user1, "VIN123");
+
+    vm.stopPrank();
+    vm.prank(user1);
+
+    BatteryLogic(proxyBattery).approve(owner, 1);
+
+    vm.startPrank(owner);
+
+    BatteryLogic(proxyBattery).transferToVehicle(user1, proxyVehicle);
+
+    require(BatteryLogic(proxyBattery).ownerOf(1) == proxyVehicle, "fail transfer to vehicle");
+
+    address[] memory batteries = VehicleLogic(proxyVehicle).getBatteriesHistory();
+    require(batteries[0] == proxyBattery, "fail transfer to vehicle");
+
+    vm.stopPrank();
+  }
+
+  function testMintBatteryToVehicle() public {
+    address proxyBattery = testCreateProxyBatteryWithDeployer();
+    address proxyVehicle = testCreateProxyVehicleWithDeployer();
+    vm.startPrank(owner);
+
+    _authorization.authorize(owner);
+
+    BatteryLogic(proxyBattery).mint(proxyVehicle, "Battery123", "Manufacturer", "Status", 123456);
+
+    require(BatteryLogic(proxyBattery).ownerOf(1) == proxyVehicle, "fail mint to vehicle");
+
+    address[] memory batteries = VehicleLogic(proxyVehicle).getBatteriesHistory();
+    require(batteries[0] == proxyBattery, "fail transfer to vehicle");
+
+    vm.stopPrank();
+  }
+
+  function testTransferBatteryFromVehicle() public {
+    address proxyBattery = testCreateProxyBatteryWithDeployer();
+    address proxyVehicle = testCreateProxyVehicleWithDeployer();
+    vm.startPrank(owner);
+
+    _authorization.authorize(owner);
+
+    VehicleLogic(proxyVehicle).mint(user1, "VIN1234");
+    BatteryLogic(proxyBattery).mint(proxyVehicle, "Battery123", "Manufacturer", "Status", 123456);
+
+    require(BatteryLogic(proxyBattery).ownerOf(1) == proxyVehicle, "fail mint to vehicle");
+
+    address[] memory batteries = VehicleLogic(proxyVehicle).getBatteriesHistory();
+    require(batteries[0] == proxyBattery, "fail transfer to vehicle");
+
+    VehicleLogic(proxyVehicle).transferERC721(proxyBattery, user1);
+
+    require(BatteryLogic(proxyBattery).ownerOf(1) == user1, "fail transfer from vehicle");
+  }
+
   function testAddEventVehicle() public {
     ProxyVehicle proxyVehicle = ProxyVehicle(payable(testCreateProxyVehicleWithDeployer()));
     vm.startPrank(owner);
