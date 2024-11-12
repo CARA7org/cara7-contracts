@@ -79,6 +79,41 @@ The Authorization Smart Contract is designed to manage access control, enabling 
 
 The Beacon Smart Contract serves as a centralized reference for proxies, enabling them to dynamically link to the correct logic contract. This design pattern allows proxies to point to a single, updatable contract for business logic, ensuring they are always using the latest version without redeployment.
 
+### Link a battery passport to vehicle
+
+The battery logic have 2 way to transfer the NFT to the vehicle passport.
+
+`mint` function check if the receiver address is a contract if its a contract it will trigger the fonction from the vehicle contract `onBatteryReceived`
+
+```
+function mint(
+    address to,
+    string memory batteryId,
+    string memory manufacturer,
+    string memory batteryStatus,
+    uint256 productionDate
+  ) external onlyOwner {
+    _mint(to, 1);
+    _setMetadata(batteryId, manufacturer, batteryStatus, productionDate);
+    if (_checkAddressIsContract(to)) {
+      IVehicle(to).onBatteryReceived(address(this));
+    }
+  }
+```
+
+`transferToVehicle` is a function didicated to transfer the nft to the vehicle contract and trigger the `onBatteryReceived` function
+
+```
+function transferToVehicle(address from, address vehicleContract) external {
+    if (
+      ownerOf(1) != msg.sender &&
+      IAuthorization(_authorizationContract).isAuthorized(msg.sender) == false
+    ) revert InvalidCallerNotOwner();
+    safeTransferFrom(from, vehicleContract, 1);
+    IVehicle(vehicleContract).onBatteryReceived(address(this));
+  }
+```
+
 ## Instalation
 
 This repo use Foundry => https://book.getfoundry.sh/
