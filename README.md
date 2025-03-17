@@ -49,12 +49,25 @@ Each proxy is an NFT so we can retrieve easely a specific NFT. This can be achie
 
 ## Deployed contract
 
+### XRPL
+
 | Nom du Contrat | Adresse du Contrat                           | Lien vers l'Explorateur                                                                                      |
 | -------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | Deployer       | `0x78aaAcd84F0336671C45B17B683851077034ddEa` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x78aaAcd84F0336671C45B17B683851077034ddEa) |
 | Authorization  | `0x2A9F6B5b6c0a51B804Fcd044C86Bfd19Ab042124` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x2A9F6B5b6c0a51B804Fcd044C86Bfd19Ab042124) |
 | Beacon Vehicle | `0x5D2Ae7da2c74dCe17Aca6F2480e01405aa145E27` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x5D2Ae7da2c74dCe17Aca6F2480e01405aa145E27) |
 | Beacon Battery | `0x04198Da884AaCBfBd437f2cDCf1C48ebAa81ab66` | [Voir sur explorer xrplevm](https://explorer.xrplevm.org/address/0x04198Da884AaCBfBd437f2cDCf1C48ebAa81ab66) |
+
+### POLYGON
+
+| Nom du Contrat | Adresse du Contrat                           | Lien vers l'Explorateur                                                                             |
+| -------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Deployer       | `0x08C2a14Fae984de9e81AF67c9f0eCE4a9148fC0E` | [polygon explorer](https://amoy.polygonscan.com/address/0x08c2a14fae984de9e81af67c9f0ece4a9148fc0e) |
+| Authorization  | `0xBc47C89a5722a05f2e19d572E9b77Cb8fc2fd59E` | [polygon explorer](https://amoy.polygonscan.com/address/0xBc47C89a5722a05f2e19d572E9b77Cb8fc2fd59E) |
+| Beacon Vehicle | `0x8Ca321338002c7d7f79379E6c3eB4CAC39D13131` | [polygon explorer](https://amoy.polygonscan.com/address/0x8Ca321338002c7d7f79379E6c3eB4CAC39D13131) |
+| Beacon Battery | `0x6545476C853a1a5C71873C5719C67a6F65A2BCc6` | [polygon explorer](https://amoy.polygonscan.com/address/0x6545476C853a1a5C71873C5719C67a6F65A2BCc6) |
+| Vehicle Logic  | `0xE3DCF0201E91E6411C6C961FdD5070b78908149C` | [polygon explorer](https://amoy.polygonscan.com/address/0xE3DCF0201E91E6411C6C961FdD5070b78908149C) |
+| Battery Logic  | `0x528D945DEDEccA3F7f625019f70f74961532F40A` | [polygon explorer](https://amoy.polygonscan.com/address/0x528D945DEDEccA3F7f625019f70f74961532F40A) |
 
 ## Contracts
 
